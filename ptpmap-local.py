@@ -37,13 +37,13 @@ txFreqSet = set()
 ptpLinks = []
 
 for row in taflCsv:
-    if row['Service'] == '2' and row['Subservice'] == '200' and row['TXRX'] == 'TX':
+    if row['Service'] == '2' and row['Subservice'] in ['200','201'] and row['TXRX'] == 'TX':
         txRecords.append(row)
         txLicAuthNumSet.add(row['AuthorizationNumber'])
         txFreqSet.add(row['Frequency'])
         #txLatSet.add(row['Latitude'])
         #txLongSet.add(row['Longitude'])
-    if row['Service'] == '2' and row['Subservice'] == '200' and row['TXRX'] == 'RX':
+    if row['TXRX'] == 'RX':
         allRxRecs.append(row)
 print("Found " + str(len(txRecords)) + " licenses. Finding matching RX licenses")
 cleanrx = []
@@ -70,37 +70,55 @@ kml = simplekml.Kml()
 
 bellStyle = simplekml.Style()
 bellStyle.linestyle.width = 2
-bellStyle.linestyle.color = 'ffff0000'
+bellStyle.linestyle.color = 'ffff0000' # Blue
 
 rogersStyle = simplekml.Style()
 rogersStyle.linestyle.width = 2
-rogersStyle.linestyle.color = 'ff0000ff'
+rogersStyle.linestyle.color = 'ff0000ff' # Red
 
 telusStyle = simplekml.Style()
 telusStyle.linestyle.width = 2
-telusStyle.linestyle.color = 'ff3CFF14'
+telusStyle.linestyle.color = 'ff3CFF14' # Green
+
+xplornetStyle = simplekml.Style()
+xplornetStyle.linestyle.width = 2
+xplornetStyle.linestyle.color = 'FF1478A0' # Brown
+
+freedomStyle = simplekml.Style()
+freedomStyle.linestyle.width = 2
+freedomStyle.linestyle.color = 'ff14B4FF' # Orange
 
 otherStyle = simplekml.Style()
 otherStyle.linestyle.width = 2
-otherStyle.linestyle.color = 'ffFF78F0'
+otherStyle.linestyle.color = 'ffFF78F0' # Magenta
 
 
+def styleLink(licName, kmlLink):
+    kmlLink.altitudemode = simplekml.AltitudeMode.relativetoground
+    licNameLow = licName.lower()
 
+    if licNameLow.find('bell') != -1:
+        kmlLink.style = bellStyle
+    elif licNameLow.find('rogers') != -1:
+        kmlLink.style = rogersStyle
+    elif licNameLow.find('telus') != -1:
+        kmlLink.style = telusStyle
+    elif licNameLow.find('xplornet') != -1:
+        kmlLink.style = xplornetStyle
+    elif licNameLow.find('freedom mobile') != -1:
+        kmlLink.style = freedomStyle
+    else:
+        kmlLink.style = otherStyle
 
 for ptp in progressbar.progressbar(ptpLinks):
     if len(ptp['rx']) == 1:
 
-        linkDesc = """
-        Bandwidth(MHz): {}
-        Analog Capacity (Calls): {}
-        Digital Capacity (Mbps): {}
-        In Service Date: {}
-        """.format(
-            str(float(ptp['tx']['OccupiedBandwidthKHz']) / 1000),
-            str(ptp['tx']['AnalogCapacity']),
-            str(ptp['tx']['DigitalCapacity']),
-            str(ptp['tx']['InserviceDate'])
-        )
+        linkDesc = f"""
+        Bandwidth(MHz): {str(float(ptp['tx']['OccupiedBandwidthKHz']) / 1000)}
+        Analog Capacity (Calls): {str(ptp['tx']['AnalogCapacity'])}
+        Digital Capacity (Mbps): {str(ptp['tx']['DigitalCapacity'])}
+        In Service Date: {str(ptp['tx']['InserviceDate'])}
+        """
 
         kmlLink = kml.newlinestring(
             name="{} | {}".format(ptp['tx']['LicenseeName'], str(ptp['tx']['Frequency'])),
@@ -111,23 +129,15 @@ for ptp in progressbar.progressbar(ptpLinks):
             ]
 
         )
-        kmlLink.altitudemode = simplekml.AltitudeMode.relativetoground
-        #kmlLink.style.linestyle.width = 2
-        if ptp['tx']['LicenseeName'].lower().find('bell') != -1:
-            #kmlLink.style.linestyle.color = 'ffff0000'
-            kmlLink.style = bellStyle
-        elif ptp['tx']['LicenseeName'].lower().find('rogers') != -1:
-            #kmlLink.style.linestyle.color = 'ff0000ff'
-            kmlLink.style = rogersStyle
-        elif ptp['tx']['LicenseeName'].lower().find('telus') != -1:
-            #kmlLink.style.linestyle.color = 'ff3CFF14'
-            kmlLink.style = telusStyle
-        else:
-            #kmlLink.style.linestyle.color = 'ffFF78F0'
-            kmlLink.style = otherStyle
+        styleLink(ptp['tx']['LicenseeName'], kmlLink)
+
     elif len(ptp['rx']) > 1:
         # Subservice 201 is Point to Multipoint, one TX with multiple RX
-        if ptp['tx']['Subservice'] == "201":
+        # There's not really a good way to display this for large systems like BC Hydro or Milton Hydro
+        # It just looks like a mess and makes Google Earth chug, so I'm whitelisting a few interesting systems
+        if ptp['tx']['Subservice'] == "201" and ptp['tx']['LicenseeName'] in [
+            'Bell Canada','Northwestel Inc.', 'Telus Communications Inc.', 'Sasktel', 'Hydro-Québec'
+        ]:
             for endpoint in ptp['rx']:
                 kmlLink = kml.newlinestring(
                     name="{} | {}".format(ptp['tx']['LicenseeName'], str(ptp['tx']['Frequency'])),
@@ -138,20 +148,7 @@ for ptp in progressbar.progressbar(ptpLinks):
                     ]
 
                 )
-                kmlLink.altitudemode = simplekml.AltitudeMode.relativetoground
-                #kmlLink.style.linestyle.width = 2
-                if ptp['tx']['LicenseeName'].lower().find('bell') != -1:
-                    #kmlLink.style.linestyle.color = 'ffff0000'
-                    kmlLink.style = bellStyle
-                elif ptp['tx']['LicenseeName'].lower().find('rogers') != -1:
-                    #kmlLink.style.linestyle.color = 'ff0000ff'
-                    kmlLink.style = rogersStyle
-                elif ptp['tx']['LicenseeName'].lower().find('telus') != -1:
-                    #kmlLink.style.linestyle.color = 'ff3CFF14'
-                    kmlLink.style = telusStyle
-                else:
-                    #kmlLink.style.linestyle.color = 'ffFF78F0'
-                    kmlLink.style = otherStyle
+                styleLink(ptp['tx']['LicenseeName'], kmlLink)
         else:
 
             errorMsg = f"""

@@ -80,27 +80,23 @@ telusStyle = simplekml.Style()
 telusStyle.linestyle.width = 2
 telusStyle.linestyle.color = 'ff3CFF14'
 
+xplornetStyle = simplekml.Style()
+xplornetStyle.linestyle.width = 2
+xplornetStyle.linestyle.color = 'FF1478A0'
+
 otherStyle = simplekml.Style()
 otherStyle.linestyle.width = 2
 otherStyle.linestyle.color = 'ffFF78F0'
 
-
-
-
 for ptp in progressbar.progressbar(ptpLinks):
     if len(ptp['rx']) == 1:
 
-        linkDesc = """
-        Bandwidth(MHz): {}
-        Analog Capacity (Calls): {}
-        Digital Capacity (Mbps): {}
-        In Service Date: {}
-        """.format(
-            str(float(ptp['tx']['OccupiedBandwidthKHz']) / 1000),
-            str(ptp['tx']['AnalogCapacity']),
-            str(ptp['tx']['DigitalCapacity']),
-            str(ptp['tx']['InserviceDate'])
-        )
+        linkDesc = f"""
+        Bandwidth(MHz): {str(float(ptp['tx']['OccupiedBandwidthKHz']) / 1000)}
+        Analog Capacity (Calls): {str(ptp['tx']['AnalogCapacity'])}
+        Digital Capacity (Mbps): {str(ptp['tx']['DigitalCapacity'])}
+        In Service Date: {str(ptp['tx']['InserviceDate'])}
+        """
 
         kmlLink = kml.newlinestring(
             name="{} | {}".format(ptp['tx']['LicenseeName'], str(ptp['tx']['Frequency'])),
@@ -112,18 +108,15 @@ for ptp in progressbar.progressbar(ptpLinks):
 
         )
         kmlLink.altitudemode = simplekml.AltitudeMode.relativetoground
-        #kmlLink.style.linestyle.width = 2
         if ptp['tx']['LicenseeName'].lower().find('bell') != -1:
-            #kmlLink.style.linestyle.color = 'ffff0000'
             kmlLink.style = bellStyle
         elif ptp['tx']['LicenseeName'].lower().find('rogers') != -1:
-            #kmlLink.style.linestyle.color = 'ff0000ff'
             kmlLink.style = rogersStyle
         elif ptp['tx']['LicenseeName'].lower().find('telus') != -1:
-            #kmlLink.style.linestyle.color = 'ff3CFF14'
             kmlLink.style = telusStyle
+        elif ptp['tx']['LicenseeName'].lower().find('xplornet') != -1:
+            kmlLink.style = xplornetStyle
         else:
-            #kmlLink.style.linestyle.color = 'ffFF78F0'
             kmlLink.style = otherStyle
     elif len(ptp['rx']) > 1:
         # Subservice 201 is Point to Multipoint, one TX with multiple RX
@@ -139,18 +132,15 @@ for ptp in progressbar.progressbar(ptpLinks):
 
                 )
                 kmlLink.altitudemode = simplekml.AltitudeMode.relativetoground
-                #kmlLink.style.linestyle.width = 2
                 if ptp['tx']['LicenseeName'].lower().find('bell') != -1:
-                    #kmlLink.style.linestyle.color = 'ffff0000'
                     kmlLink.style = bellStyle
                 elif ptp['tx']['LicenseeName'].lower().find('rogers') != -1:
-                    #kmlLink.style.linestyle.color = 'ff0000ff'
                     kmlLink.style = rogersStyle
                 elif ptp['tx']['LicenseeName'].lower().find('telus') != -1:
-                    #kmlLink.style.linestyle.color = 'ff3CFF14'
                     kmlLink.style = telusStyle
+                elif ptp['tx']['LicenseeName'].lower().find('xplornet') != -1:
+                    kmlLink.style = xplornetStyle
                 else:
-                    #kmlLink.style.linestyle.color = 'ffFF78F0'
                     kmlLink.style = otherStyle
         else:
 

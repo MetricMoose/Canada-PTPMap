@@ -13,3 +13,12 @@ This project was founded by MetricMoose as a way to visualize the Point-to-Point
 
 ## Other notes
 Other options for datasets (including Field Descriptions) can be obtained at the following link: https://sms-sgs.ic.gc.ca/eic/site/sms-sgs-prod.nsf/eng/h_00010.html
+
+## Example Photos
+Zoomed out photo of Canada
+
+![Map of Canada](https://imgur.com/RDotDIG.jpg)
+
+CN Tower, Toronto
+
+![CN Tower](https://imgur.com/Q943FZA.jpg)

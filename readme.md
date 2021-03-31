@@ -1,3 +1,11 @@
+# Prerequisites
+- python
+- python-pip
+
+# Install required pip modules
+`pip install progressbar2 simplekml`
+
+
 Download the dataset from ISED's website: 
 
 CSV: http://www.ic.gc.ca/engineering/SMS_TAFL_Files/TAFL_LTAF.zip

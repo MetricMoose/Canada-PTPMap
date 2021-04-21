@@ -11,7 +11,7 @@ cursor = cnx.cursor(dictionary=True)
 logFile = open("ptpmap-log.txt", "w")
 print("Finding TX Licenses")
 cursor.execute("""
-	SELECT tafl_id, Frequency,OccupiedBandwidthKHz,AnalogCapacity,DigitalCapacity,HeightAboveGroundLevel,
+	SELECT tafl_id, Frequency,OccupiedBandwidthKHz,AnalogCapacity,DigitalCapacity,HeightAboveGroundLevel, Provinces,
 	AzimuthOfMainLobe,Latitude,Longitude,AuthorizationNumber,LicenseeName,InserviceDate, Subservice, FrequencyRecordIdentifier
 	FROM taflextract WHERE Service = 2 AND (Subservice = 200 OR Subservice = 201) AND TXRX='TX'
 """)
@@ -73,6 +73,27 @@ otherStyle = simplekml.Style()
 otherStyle.linestyle.width = 2
 otherStyle.linestyle.color = 'ffFF78F0' # Magenta
 
+kmlFolders = {}
+
+kmlFolders['AB'] = kml.newfolder(name='Alberta')
+kmlFolders['BC'] = kml.newfolder(name='British Columbia')
+kmlFolders['CW'] = kml.newfolder(name='All Canada')
+kmlFolders['NL'] = kml.newfolder(name='Newfoundland and Labrador')
+kmlFolders['NB'] = kml.newfolder(name='New Brunswick')
+kmlFolders['MB'] = kml.newfolder(name='Manitoba')
+kmlFolders['NU'] = kml.newfolder(name='Nunavut')
+kmlFolders['ON'] = kml.newfolder(name='Ontario')
+kmlFolders['PE'] = kml.newfolder(name='Prince Edward Island')
+kmlFolders['QC'] = kml.newfolder(name='Quebec')
+kmlFolders['SK'] = kml.newfolder(name='Saskatchewan')
+kmlFolders['NT'] = kml.newfolder(name='North West Territories')
+kmlFolders['US'] = kml.newfolder(name='United States')
+kmlFolders['NS'] = kml.newfolder(name='Nova Scotia')
+kmlFolders['YT'] = kml.newfolder(name='Yukon')
+kmlFolders['IP'] = kml.newfolder(name='Interprovincial')
+kmlFolders[''] = kml.newfolder(name='Other')
+
+
 
 def styleLink(licName, kmlLink):
     kmlLink.altitudemode = simplekml.AltitudeMode.relativetoground
@@ -101,7 +122,8 @@ for ptp in progressbar.progressbar(ptpLinks):
         In Service Date: {str(ptp['tx']['InserviceDate'])}
         """
 
-        kmlLink = kml.newlinestring(
+        #kmlLink = kml.newlinestring(
+        kmlLink = kmlFolders[ptp['tx']['Provinces']].newlinestring(
             name="{} | {}".format(ptp['tx']['LicenseeName'], str(ptp['tx']['Frequency'])),
             description=linkDesc,
             coords=[
@@ -120,7 +142,8 @@ for ptp in progressbar.progressbar(ptpLinks):
             'Bell Canada','Northwestel Inc.', 'Telus Communications Inc.', 'Sasktel', 'Hydro-Québec'
         ]:
             for endpoint in ptp['rx']:
-                kmlLink = kml.newlinestring(
+                #kmlLink = kml.newlinestring(
+                kmlLink = kmlFolders[ptp['tx']['Provinces']].newlinestring(
                     name="{} | {}".format(ptp['tx']['LicenseeName'], str(ptp['tx']['Frequency'])),
                     description=linkDesc,
                     coords=[

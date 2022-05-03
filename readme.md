@@ -4,6 +4,8 @@ This project was founded by MetricMoose as a way to visualize the Point-to-Point
 ## Prerequisites
 - python3
 - python3-pip
+- progressbar2 package
+- simplekml package
 
 ## Steps to generate the map
 1) Install required pip modules: `pip install progressbar2 simplekml`

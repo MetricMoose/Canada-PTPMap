@@ -4,12 +4,13 @@ This project was founded by MetricMoose as a way to visualize the Point-to-Point
 ## Prerequisites
 - python3
 - python3-pip
+- pip modules: progressbar2, simplekml, pandas
 
 ## Steps to generate the map
-1) Install required pip modules: `pip install progressbar2 simplekml`
+1) Install required pip modules: `pip install progressbar2 simplekml pandas`
 2) Download the dataset from ISED's website: `wget http://www.ic.gc.ca/engineering/SMS_TAFL_Files/TAFL_LTAF.zip`
 3) Extract the obtained dataset to reveal the Comma-Separated Values document containing the data.
-4) Run the map generation script: `python3 ptpmap-local.py`
+4) Run the map generation script: `python3 ptpmap-local-pandas.py`
 
 ## Other notes
 Other options for datasets (including Field Descriptions) can be obtained at the following link: https://sms-sgs.ic.gc.ca/eic/site/sms-sgs-prod.nsf/eng/h_00010.html

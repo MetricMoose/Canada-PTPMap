@@ -105,7 +105,7 @@ def styleLink(licName, kmlLink):
         kmlLink.style = rogersStyle
     elif licNameLow.find('telus') != -1:
         kmlLink.style = telusStyle
-    elif licNameLow.find('xplornet') != -1:
+    elif licNameLow.find('xplore inc') != -1:
         kmlLink.style = xplornetStyle
     elif licNameLow.find('freedom mobile') != -1:
         kmlLink.style = freedomStyle
